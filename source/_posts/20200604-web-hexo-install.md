@@ -2,9 +2,8 @@
 title: 部署 Hexo 
 date: 2020-06-04 16:00:02
 categories:
-- web前端
-tags:
 - 前端
+tags:
 - hexo
 ---
 使用 hexo 搭建个人博客，并且可以根据喜好切换主题。
