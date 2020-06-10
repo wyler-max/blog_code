@@ -41,7 +41,7 @@ scrape_configs:
   - job_name: prometheus
     static_configs:
       # 采样目标地址
-      - targets: ['localhost:9090']
+      - targets: ['ip:port']
 ```
 
 ### 启动
@@ -49,13 +49,13 @@ scrape_configs:
 ./prometheus --config.file=prometheus.yml
 
 # 或者指定端口（default 9090）
-./prometheus --config.file=prometheus.yml --web.enable-lifecycle   --web.external-url="http://ip:port/prom"  \
+./prometheus --config.file=prometheus.yml --web.enable-lifecycle   --web.external-url="http://outer-ip:port/prom"  \
  --web.route-prefix=prom   --web.listen-address="0.0.0.0:port" --log.level="info"
 ```
 
 重启
 ```bash
-curl -XPOST http://127.0.0.1:port/prom/-/reload
+curl -XPOST http://localhost:port/prom/-/reload
 ```
 
 ### 监控面板
@@ -74,7 +74,7 @@ http://localhost:9090/metrics
 
 访问如下地址，并选择 Console
 ```
-http://localhost:9090/graph
+http://outer-ip:9090/graph
 ```
 
 选择关于Prometheus自身的一个度量选项：
