@@ -1,5 +1,5 @@
 ---
-title: 20200711-java-jvm-jmap
+title: jmap 为什么会触发 FULL GC
 date: 2020-07-12 17:39:10
 tags:
 - JVM
@@ -35,7 +35,7 @@ Linux CentOS7、jdk8、64位
 
 跟进查看 histo 方法，发现在调用heapHisto 方法是参数有变化
 
-```java
+```
 private static void histo(String var0, boolean var1) throws IOException {
     VirtualMachine var2 = attach(var0);
     InputStream var3 = ((HotSpotVirtualMachine)var2).heapHisto(new Object[] {var1 ? "-live" : "-all"});
@@ -43,11 +43,13 @@ private static void histo(String var0, boolean var1) throws IOException {
 }
 ```
 
-跟进查看 heapHisto 发现这个方法在是 sun.tools.attach.HotSpotVirtualMachine.java 类中。HotSpot就是当前归属于Oracle 公司，世界上使用最广泛的虚拟机。 HotSpotVirtualMachine 类继承的是 VirtualMachine  虚拟机类。
+跟进查看 heapHisto 发现这个方法在是 sun.tools.attach.HotSpotVirtualMachine.java 类中。HotSpot是JDK自带的虚拟机，当前归属于Oracle 公司，是世界上使用最广泛的虚拟机。可以通过 java -version 查看
+
+ HotSpotVirtualMachine 类继承的是 VirtualMachine  虚拟机类。
 
 在这里我们能看到，像dumpHeap、heapHisto 都被封装 executeCommand 函数调用。
 
-```java
+```
 public InputStream dumpHeap(Object... var1) throws IOException {
     return this.executeCommand("dumpheap", var1);
 }
@@ -102,3 +104,8 @@ jmap -dump:live,file=dump_001.bin pid
 个人分析，这大概是因为需要过滤活跃的对象，而活跃的对象是时刻都在发生变化的，为了快速分离，jvm最简单的方法就是通过一次FULL GC清理掉不活跃的对象，然后导出。
 
 
+## 04 参考链接
+
+https://www.iteye.com/blog/langzi-xl-798905
+https://my.oschina.net/u/2518341/blog/1931088
+https://github.com/openjdk/jdk
